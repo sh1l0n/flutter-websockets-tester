@@ -3,6 +3,8 @@
 // Copyright Author 2021 All rights reserved.
 //
 
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,22 +17,35 @@ class WssWidget extends StatefulWidget {
 }
 
 class _WssWidgetState extends State<WssWidget> {
-  // final _websocket = WssClient();
+  final _websocket = WssClient();
+
+  final StreamController<bool> _loggingController = StreamController<bool>.broadcast();
+  Sink<bool> get _loggingSink => _loggingController.sink;
+  Stream<bool> get _loggingStream => _loggingController.stream;
+
+  String _url;
+  String _command;
+  String _logs;
 
   @override
   void initState() {
     super.initState();
-    // _websocket.stream.listen((WssClientMessage message) {
-    //   print('[+] Received message : ${message.dumps}');
-    // });
+    _url = '';
+    _logs = '';
+    _command = '';
+    _websocket.stream.listen((String message) {
+      _logs += '< ' + message + "\n";
+      _loggingSink.add(true);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    // if (_websocket != null) {
-    //   _websocket.dispose();
-    // }
+    if (_websocket != null) {
+      _websocket.dispose();
+    }
+    _loggingController.close();
   }
 
   @override
@@ -119,7 +134,7 @@ class _WssWidgetState extends State<WssWidget> {
       autocorrect: false,
       maxLines: 1,
       cursorColor: Colors.black,
-      //onChanged: onChanged,
+      onChanged: onChanged,
     );
   }
 
@@ -138,12 +153,18 @@ class _WssWidgetState extends State<WssWidget> {
           children: [
             Container(
               width: size.width * 0.6, 
-              child: _buildTextFieldForm(hintText, (){}),
+              child: _buildTextFieldForm(hintText, (final String onChanged){
+                _url = onChanged;
+              }),
             ),
             Container(width: 5),
-            _buildFlatButton(connectText, (){}, Colors.lightGreen),
+            _buildFlatButton(connectText, (){
+              _websocket.connect(_url);
+            }, Colors.lightGreen),
             Container(width: 5),
-            _buildFlatButton(disconnectText, (){}, Colors.amberAccent),
+            _buildFlatButton(disconnectText, (){
+              _websocket.disconnect();
+            }, Colors.amberAccent),
           ],
         ),
       );
@@ -153,13 +174,19 @@ class _WssWidgetState extends State<WssWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildTextFieldForm(hintText, (){}),
+            _buildTextFieldForm(hintText, (final String onChanged){
+              _url = onChanged;
+            }),
             Container(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildFlatButton(disconnectText, (){}, Colors.amberAccent),
-                _buildFlatButton(connectText, (){}, Colors.lightGreen),
+                _buildFlatButton(disconnectText, (){
+                  _websocket.connect(_url);
+                }, Colors.amberAccent),
+                _buildFlatButton(connectText, (){
+                  _websocket.disconnect();
+                }, Colors.lightGreen),
               ],
             ),
           ],
@@ -188,7 +215,14 @@ class _WssWidgetState extends State<WssWidget> {
           primary: true,
           scrollDirection: Axis.vertical,
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Text("asdasd\n\n\n\n\n\n\n\n\n\n\n\ewen\n\n\n\n\n\n\n\qn\n\n\n\n\n\n\n\n\n\n\n\n\a\na\na\na\na\na\na\na\na\n\n\n\n\n\n\n\n\n\n\nvi\n\n\n\n\n\n\n\n\nii\n\n\n\n\n\n\n\n\n\ni\n"),
+          child: StreamBuilder(
+            initialData: true,
+            stream: _loggingStream,
+            builder: (BuildContext c, AsyncSnapshot<bool> a) {
+              print('[+] Received message : $_logs');
+              return Text(_logs);
+            },
+          ),
         ),
       )
     );
@@ -208,10 +242,14 @@ class _WssWidgetState extends State<WssWidget> {
         children: [
           Container(
             width: size.width * 0.75, 
-            child: _buildTextFieldForm(hintText, (){}),
+            child: _buildTextFieldForm(hintText, (final String onChanged){
+              _command = onChanged;
+            }),
           ),
           Container(width: 5),
-          _buildFlatButton(sendText, (){}, Colors.lightGreen),
+          _buildFlatButton(sendText, (){
+            _websocket.send(_command);
+          }, Colors.lightGreen),
         ],
       ),
     );
@@ -221,9 +259,15 @@ class _WssWidgetState extends State<WssWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildTextFieldForm(hintText, (){}),
+            _buildTextFieldForm(hintText, (final String onChanged){
+              _command = onChanged;
+            }),
             Container(height: 5),
-            _buildFlatButton(sendText, (){}, Colors.lightGreen),
+            _buildFlatButton(sendText, (){
+              _logs += '> ' + _command + "\n";
+              _loggingSink.add(true);
+              _websocket.send(_command);
+            }, Colors.lightGreen),
           ],
         ),
       );

@@ -31,24 +31,24 @@ class WssClient extends WssClientBLoC {
   // }
 
   void _onMessage(String message) {
-    print("_onMessage $message");
+    // print("_onMessage $message");
+    _sink.add(message);
   }
 
   @override
-  connect(final String host, final String port) {
+  connect(final String host) {
     if (isConnected) {
       disconnect();
     }
 
-    final url = Uri.parse("ws://" + host + ":" + port);
+    final url = Uri.parse(host);
     _websocket = HtmlWebSocketChannel.connect(url);
     _websocket.sink.done.then((value) {
       _isConnected = false;
-      print("[+] Close websocket");
+      _sink.add('Closed by server');
     });
 
     _websocket.stream.listen((message) {
-      print('[+] Received $message');
       _onMessage(message);
     });
     // sleep(Duration(seconds: 20));
@@ -60,6 +60,7 @@ class WssClient extends WssClientBLoC {
     if (isConnected) {
       _isConnected = false;
       _url = "";
+      _sink.add('Closed by client');
       _websocket.sink.close(1000, 'Closed by client');
       _websocket = null;
     }
