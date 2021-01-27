@@ -1,0 +1,7 @@
+.dart_tool/
+.packages
+*.lock
+*DS_Store
+build/
+.flutter-plugins*
+*.iml
