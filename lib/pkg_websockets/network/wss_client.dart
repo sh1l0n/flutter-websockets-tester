@@ -6,18 +6,18 @@
 import 'dart:async';
 
 import 'package:web_socket_channel/html.dart';
-// import 'dart:html' show Event, MessageEvent, CloseEvent, WebSocket;
 
 import 'wss_bloc.dart';
-import 'wss_message.dart';
+// import 'dart:html' show Event, MessageEvent, CloseEvent, WebSocket;
+
 
 class WssClient extends WssClientBLoC {
   // WebSocket _webSocket;
   HtmlWebSocketChannel _websocket;
   bool _isConnected = false;
   String _url = "";
-  final StreamController<WssClientMessage> _messageHandlingController = StreamController<WssClientMessage>.broadcast();
-  Sink<WssClientMessage> get _sink => _messageHandlingController.sink;
+  final StreamController<String> _messageHandlingController = StreamController<String>.broadcast();
+  Sink<String> get _sink => _messageHandlingController.sink;
 
   // void sleep(Duration duration) {
   //   var ms = duration.inMilliseconds;
@@ -30,14 +30,8 @@ class WssClient extends WssClientBLoC {
   //   }
   // }
 
-  void _onMessage(WssClientMessage message) {
-    if (message.event == 'connection' && message.topic == WssClientMessage.statusKey && message.data.containsKey('readyState') && message.data['readyState']) {
-      _isConnected = true;
-    } else if (message.event == 'subscribe') {
-      print("subscribe");
-    } else if (message.event == 'unsubscribe') {
-      print("unsubscribe");
-    }
+  void _onMessage(String message) {
+    print("_onMessage $message");
   }
 
   @override
@@ -53,9 +47,8 @@ class WssClient extends WssClientBLoC {
       print("[+] Close websocket");
     });
 
-    _websocket.stream.listen((event) {
-      final message = WssClientMessage.fromString(event.toString());
-      print('[+] Received ${message.dumps}');
+    _websocket.stream.listen((message) {
+      print('[+] Received $message');
       _onMessage(message);
     });
     // sleep(Duration(seconds: 20));
@@ -82,15 +75,15 @@ class WssClient extends WssClientBLoC {
   String get url => _url;
 
   @override
-  void send(final WssClientMessage message) {
+  void send(final String message) {
     if (isConnected) {
-      _websocket.sink.add(message.dumps);
+      _websocket.sink.add(message);
       // _webSocket.send(message.dumps);
     }
   }
 
   @override
-  Stream<WssClientMessage> get stream => _messageHandlingController.stream;
+  Stream<String> get stream => _messageHandlingController.stream;
 
   @override
   void dispose() {

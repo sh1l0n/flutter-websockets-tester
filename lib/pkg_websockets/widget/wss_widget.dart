@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../network/wss_client.dart';
-import '../network/wss_message.dart';
 
 class WssWidget extends StatefulWidget {
   @override
@@ -37,7 +36,6 @@ class _WssWidgetState extends State<WssWidget> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     final titleStyle = const TextStyle(color: Color(0xff000000), fontFamily: "Lucida Console", fontSize: 32, fontWeight: FontWeight.bold, package: '');
     final subtitleStyle = const TextStyle(color: Color(0xff000000), fontFamily: "Lucida Console", fontSize: 18, fontWeight: FontWeight.normal, package: '');
     final footerStyle = const TextStyle(color: Color(0xff000000), fontFamily: "Lucida Console", fontSize: 10, fontWeight: FontWeight.bold, package: '');
@@ -126,9 +124,7 @@ class _WssWidgetState extends State<WssWidget> {
   }
 
   Widget _buildConnectForm(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
-    
     final connectText = 'Connect';
     final disconnectText = 'Disconnect';
     final hintText = 'Ex.: wss://127.0.0.1:1234';
@@ -170,7 +166,6 @@ class _WssWidgetState extends State<WssWidget> {
         ),
       );
     }
-    
   }
 
   Widget _buildLoggingArea(BuildContext context) {
@@ -220,29 +215,18 @@ class _WssWidgetState extends State<WssWidget> {
         ],
       ),
     );
-
     } else {
       return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _buildTextFieldForm(hintText, (){}),
-          Container(height: 5),
-          _buildFlatButton(sendText, (){}, Colors.lightGreen),
-        ],
-      ),
-    );
-    }
-
-    
+        margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildTextFieldForm(hintText, (){}),
+            Container(height: 5),
+            _buildFlatButton(sendText, (){}, Colors.lightGreen),
+          ],
+        ),
+      );
+    } 
   }
-
-
-  // void send(final String message) {
-  //   if (_websocket != null && _websocket.isConnected) {
-  //     print("[+] Send message to server: $message");
-  //     _websocket.sink.add(message);
-  //   }
-  // }
 }

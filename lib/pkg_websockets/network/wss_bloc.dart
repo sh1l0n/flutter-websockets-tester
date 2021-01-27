@@ -3,8 +3,6 @@
 // Copyright Author 2021 All rights reserved.
 //
 
-import 'wss_message.dart';
-
 abstract class BLoC {
   void dispose();
 }
@@ -15,6 +13,6 @@ abstract class WssClientBLoC implements BLoC {
   bool get isConnected => false;
   String get url => "";
 
-  void send(final WssClientMessage message);
-  Stream<WssClientMessage> get stream => null;
+  void send(final String message);
+  Stream<String> get stream => null;
 }
