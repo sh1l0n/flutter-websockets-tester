@@ -258,6 +258,8 @@ class _WssWidgetState extends State<WssWidget> {
           ),
           Container(width: 5),
           _buildFlatButton(sendText, (){
+            _logs += '> ' + _command + "\n";
+            _loggingSink.add(true);
             _websocket.send(_command);
           }, Colors.lightGreen),
         ],
