@@ -36,23 +36,27 @@ class WssClient extends WssClientBLoC {
   }
 
   @override
-  connect(final String host) {
+  void connect(final String host) {
     if (isConnected) {
       disconnect();
     }
 
-    final url = Uri.parse(host);
-    _websocket = HtmlWebSocketChannel.connect(url);
-    _websocket.sink.done.then((value) {
-      _isConnected = false;
-      _sink.add('Closed by server');
-    });
+    try {
+      final url = Uri.parse(host);
+      _websocket = HtmlWebSocketChannel.connect(url);
+      _websocket.sink.done.then((value) {
+        _isConnected = false;
+        _sink.add('Closed by server');
+      });
 
-    _websocket.stream.listen((message) {
-      _onMessage(message);
-    });
-    // sleep(Duration(seconds: 20));
-    return isConnected;
+      _websocket.stream.listen((message) {
+        _isConnected = true;
+        _onMessage(message);
+      });
+    } catch(e) {
+      _sink.add('Cannot connect to $host');
+      _isConnected = false;
+    }
   }
 
   @override

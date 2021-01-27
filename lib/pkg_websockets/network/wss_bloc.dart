@@ -8,7 +8,7 @@ abstract class BLoC {
 }
 
 abstract class WssClientBLoC implements BLoC {
-  bool connect(final String host) => false;
+  void connect(final String host);
   bool disconnect() => false;
   bool get isConnected => false;
   String get url => "";

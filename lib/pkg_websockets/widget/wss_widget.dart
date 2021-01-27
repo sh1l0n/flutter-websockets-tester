@@ -142,6 +142,7 @@ class _WssWidgetState extends State<WssWidget> {
     final size = MediaQuery.of(context).size;
     final connectText = 'Connect';
     final disconnectText = 'Disconnect';
+    final clearText = 'Clear logs';
     final hintText = 'Ex.: wss://127.0.0.1:1234';
     final isOnSmallScreen = size.width<600;
 
@@ -165,6 +166,11 @@ class _WssWidgetState extends State<WssWidget> {
             _buildFlatButton(disconnectText, (){
               _websocket.disconnect();
             }, Colors.amberAccent),
+            Container(width: 5),
+            _buildFlatButton(clearText, (){
+              _logs = '';
+              _loggingSink.add(true);
+            }, Colors.orangeAccent),
           ],
         ),
       );
@@ -184,6 +190,10 @@ class _WssWidgetState extends State<WssWidget> {
                 _buildFlatButton(disconnectText, (){
                   _websocket.connect(_url);
                 }, Colors.amberAccent),
+                _buildFlatButton(clearText, (){
+                  _logs = '';
+                  _loggingSink.add(true);
+                }, Colors.orangeAccent),
                 _buildFlatButton(connectText, (){
                   _websocket.disconnect();
                 }, Colors.lightGreen),
